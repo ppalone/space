@@ -1,0 +1,41 @@
+---
+import { getCollection, getEntry } from "astro:content"
+export async function getStaticPaths() {
+  const blogs = await getCollection("blogs")
+  return blogs.map(b => ({
+    params: {
+      slug: b.slug
+    }
+  }))
+}
+
+const { slug } = Astro.params
+const blog = await getEntry("blogs", slug)
+const { Content } = await blog.render()
+
+const folder = await getCollection("blogs", ({ data }) => {
+  return data.folder === blog.data.folder
+})
+---
+
+<h1>Blog {slug}</h1>
+
+{blog.data.folder && <div>
+  {folder.map(f => {
+    return <div class={(f.id == blog.id) ? "active" : ""}>{f.data.title}</div>
+  })}
+</div>}
+
+<div class="markdown-body">
+  <Content />
+</div>
+
+<style>
+  .markdown-body {
+    padding: 0.5rem;
+    background-color: aquamarine;
+  }
+  .active {
+    color: red;
+  }
+</style>

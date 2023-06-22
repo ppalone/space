@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+export async function getStaticPaths() {
+  const folders = await getCollection("folders")
+  return folders.map(f => ({
+    params: {
+      folder: f.id
+    }
+  }))
+}
+
+const { folder } = Astro.params
+const blogs = await getCollection("blogs", (e) => {
+  return e.data.folder == folder
+})
+console.log(blogs)
+---
+
+<h1>{folder}</h1>
+
+<ul>
+  {blogs.map(b => {
+    return <li>
+      <a href={"/blogs/" + b.slug}>{b.data.title}</a>
+    </li>
+  })}
+</ul>
